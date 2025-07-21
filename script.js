@@ -1,1190 +1,1462 @@
-/* --- CSS Variables --- */
-:root {
-    --primary-color: #007bff;
-    --primary-hover-color: #0056b3;
-    --primary-light: rgba(0, 123, 255, 0.1);
-    --success-color: #28a745;
-    --success-hover: #218838;
-    --danger-color: #dc3545;
-    --danger-hover: #c82333;
-    --warning-color: #ffc107;
-    --warning-hover: #e0a800;
-    --info-color: #17a2b8;
-    --info-hover: #138496;
-    --background-color: #f0f2f5;
-    --card-background: #ffffff;
-    --text-color: #333333;
-    --text-secondary: #666666;
-    --text-muted: #999999;
-    --border-color: #e1e5e9;
-    --border-light: #f1f3f4;
-    --shadow-light: 0 2px 10px rgba(0, 0, 0, 0.1);
-    --shadow-medium: 0 4px 20px rgba(0, 0, 0, 0.15);
-    --shadow-heavy: 0 8px 30px rgba(0, 0, 0, 0.2);
-    --gradient-primary: linear-gradient(135deg, var(--primary-color), var(--primary-hover-color));
-    --gradient-success: linear-gradient(135deg, var(--success-color), var(--success-hover));
-    --gradient-danger: linear-gradient(135deg, var(--danger-color), var(--danger-hover));
-    --border-radius: 10px;
-    --border-radius-small: 6px;
-    --border-radius-large: 15px;
-    --transition-fast: 0.2s ease;
-    --transition-medium: 0.3s ease;
-    --transition-slow: 0.5s ease;
-}
-
-/* --- Reset & Base Styles --- */
-* {
-    box-sizing: border-box;
-}
-
-body {
-    margin: 0;
-    padding: 0;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: var(--background-color);
-    color: var(--text-color);
-    font-size: 14px;
-    line-height: 1.6;
-    height: 100vh;
-    overflow-x: hidden;
-}
-
-/* --- App Container --- */
-.app-container {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    max-height: 100vh;
-}
-
-/* --- Header --- */
-.app-header {
-    flex-shrink: 0;
-    background: var(--gradient-primary);
-    color: white;
-    padding: 15px 20px;
-    box-shadow: var(--shadow-medium);
-    z-index: 100;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.app-header h1 {
-    margin: 0;
-    font-size: 1.5em;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.status-indicator {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: rgba(255, 255, 255, 0.1);
-    padding: 8px 15px;
-    border-radius: 20px;
-    backdrop-filter: blur(10px);
-    font-size: 0.9em;
-}
-
-.status-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: var(--success-color);
-    animation: pulse 2s infinite;
-}
-
-/* --- Thanh tìm kiếm và bộ lọc cố định --- */
-.search-filter-toolbar {
-    position: sticky; /* Làm cho phần tử này dính vào viewport khi cuộn */
-    top: 0;           /* Cố định ở đỉnh của viewport */
-    z-index: 1000;    /* Đảm bảo nó luôn nằm trên các phần tử khác */
-    background-color: var(--card-background); /* Hoặc màu nền bạn muốn */
-    padding: 15px 20px; /* Thêm padding cho đẹp */
-    box-shadow: var(--shadow-light); /* Thêm bóng đổ để nổi bật */
-    border-bottom: 1px solid var(--border-color); /* Đường viền phân cách nhẹ */
-    margin-bottom: 20px; /* Khoảng cách với nội dung bên dưới */
-    display: flex; /* Sử dụng flex để bố cục search-container và advanced-search-panel */
-    flex-direction: column; /* Xếp theo cột */
-    gap: 15px; /* Khoảng cách giữa các phần tử bên trong */
-}
-
-/* Điều chỉnh các container bên trong .search-filter-toolbar */
-.search-filter-toolbar .search-container {
-    margin-bottom: 0; /* Bỏ margin-bottom mặc định của search-container */
-    padding: 0; /* Bỏ padding mặc định của search-container */
-    box-shadow: none; /* Bỏ bóng đổ mặc định của search-container */
-    align-items: center; /* Căn giữa các mục trong search-container */
-}
-
-.search-filter-toolbar .advanced-search-panel {
-    margin-bottom: 0; /* Bỏ margin-bottom mặc định của advanced-search-panel */
-}
-
-/* --- Main Content --- */
-.main-content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    padding: 0 20px; /* Điều chỉnh padding để thanh sticky không bị cắt */
-    gap: 20px;
-    overflow: hidden; /* Quan trọng để các con có thể cuộn */
-    position: relative; /* Cần thiết cho một số layout */
-}
-
-.content-grid {
-    display: grid;
-    grid-template-columns: 1fr 2fr;
-    gap: 20px;
-    height: 100%;
-    /* Thêm padding trên cùng cho content-grid để nội dung không bị che bởi thanh sticky */
-    padding-top: 10px; /* Điều chỉnh giá trị này nếu cần */
-}
-
-/* --- Card Base Style --- */
-.card {
-    background: var(--card-background);
-    border-radius: var(--border-radius);
-    box-shadow: var(--shadow-light);
-    overflow: hidden;
-    transition: var(--transition-medium);
-}
-
-.card:hover {
-    box-shadow: var(--shadow-medium);
-}
-
-.card-header {
-    background: var(--gradient-primary);
-    color: white;
-    padding: 15px 20px;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-}
-
-.card-body {
-    padding: 20px;
-}
-
-/* --- Send SMS Section --- */
-.send-sms-section {
-    /* Tính toán chiều cao: 100vh trừ đi header, thanh sticky, khoảng cách và padding */
-    max-height: calc(100vh - 80px - 80px - 20px - 20px); 
-    overflow-y: auto; /* Cho phép cuộn nếu nội dung quá dài */
-}
-
-.form-group {
-    margin-bottom: 20px;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 500;
-    color: var(--text-color);
-}
-
-.form-control {
-    width: 100%;
-    padding: 12px 15px;
-    border: 2px solid var(--border-color);
-    border-radius: var(--border-radius-small);
-    font-size: 14px;
-    font-family: inherit;
-    transition: var(--transition-fast);
-    background: var(--card-background);
-}
-
-.form-control:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px var(--primary-light);
-}
-
-textarea.form-control {
-    resize: vertical;
-    min-height: 100px;
-}
-
-/* --- Buttons --- */
-.btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 12px 20px;
-    border: none;
-    border-radius: var(--border-radius-small);
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    text-decoration: none;
-    transition: var(--transition-fast);
-    position: relative;
-    overflow: hidden;
-    transform: translateY(0); /* Khởi tạo để hiệu ứng hover hoạt động */
-}
-
-.btn:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-medium);
-}
-
-.btn-primary {
-    background: var(--gradient-primary);
-    color: white;
-}
-
-.btn-primary:hover {
-    background: var(--primary-hover-color);
-}
-
-.btn-success {
-    background: var(--gradient-success);
-    color: white;
-}
-
-.btn-success:hover {
-    background: var(--success-hover);
-}
-
-.btn-danger {
-    background: var(--gradient-danger);
-    color: white;
-}
-
-.btn-danger:hover {
-    background: var(--danger-hover);
-}
-
-.btn-secondary {
-    background: var(--background-color);
-    color: var(--text-color);
-    border: 2px solid var(--border-color);
-}
-
-.btn-secondary:hover {
-    background: var(--border-color);
-    border-color: var(--text-secondary);
-}
-
-.btn-outline {
-    background: transparent;
-    color: var(--primary-color);
-    border: 2px solid var(--primary-color);
-}
-
-.btn-outline:hover {
-    background: var(--primary-color);
-    color: white;
-}
-
-.btn-sm {
-    padding: 8px 15px;
-    font-size: 13px;
-}
-
-.btn-xs {
-    padding: 4px 8px;
-    font-size: 12px;
-    min-width: auto;
-}
-
-.btn-loading {
-    color: transparent !important;
-    pointer-events: none;
-}
-
-.btn-loading::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 16px;
-    height: 16px;
-    border: 2px solid transparent;
-    border-top: 2px solid currentColor;
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    animation: spin 1s linear infinite;
-}
-
-.btn-click-effect {
-    animation: buttonClick 0.15s ease-out;
-}
-
-.btn-block {
-    width: 100%;
-}
-
-/* --- Messages Section --- */
-.messages-section {
-    /* Tính toán chiều cao: 100vh trừ đi header, thanh sticky, khoảng cách và padding */
-    max-height: calc(100vh - 80px - 80px - 20px - 20px); 
-    overflow-y: auto; /* Cho phép cuộn nếu nội dung quá dài */
-    padding-left: 20px; /* Thêm padding bên trái để các phần tử không bị dính vào cạnh */
-}
-
-/* --- Search Container --- */
-.search-container {
-    background: var(--card-background);
-    padding: 20px;
-    border-radius: var(--border-radius);
-    box-shadow: var(--shadow-light);
-    display: flex;
-    gap: 15px;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-}
-
-.search-box {
-    position: relative;
-    flex: 1;
-    min-width: 300px;
-}
-
-.search-box input {
-    width: 100%;
-    padding: 12px 45px 12px 40px;
-    border: 2px solid var(--border-color);
-    border-radius: 25px;
-    font-size: 14px;
-    transition: var(--transition-medium);
-    background: var(--background-color);
-}
-
-.search-box input:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px var(--primary-light);
-    outline: none;
-}
-
-.search-icon {
-    position: absolute;
-    left: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--text-secondary);
-}
-
-.clear-search {
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    color: var(--text-secondary);
-    cursor: pointer;
-    padding: 5px;
-    border-radius: 50%;
-    transition: var(--transition-fast);
-}
-
-.clear-search:hover {
-    background: var(--background-color);
-    color: var(--text-color);
-}
-
-/* --- Advanced Search Panel --- */
-.advanced-search-panel {
-    background: var(--background-color);
-    padding: 20px;
-    border-radius: var(--border-radius);
-    border: 1px solid var(--border-color);
-    animation: slideDown 0.3s ease-out;
-}
-
-.filter-row {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 15px;
-}
-
-.filter-group {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-}
-
-.filter-group label {
-    font-weight: 600;
-    color: var(--text-secondary);
-    font-size: 0.9em;
-}
-
-/* --- Quick Filters --- */
-.quick-filters {
-    border-top: 1px solid var(--border-light);
-    padding-top: 15px;
-}
-
-.filter-label {
-    font-weight: 600;
-    color: var(--text-secondary);
-    margin-bottom: 8px;
-    display: block;
-}
-
-.quick-filter-buttons {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-}
-
-.quick-filter-buttons .btn {
-    font-size: 11px;
-    padding: 6px 12px;
-    border-radius: 15px;
-    transition: all 0.2s ease;
-}
-
-.quick-filter-buttons .btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.2);
-}
-
-/* --- Bulk Actions Toolbar --- */
-.bulk-actions-toolbar {
-    background: var(--card-background);
-    padding: 15px;
-    border-radius: var(--border-radius);
-    margin-bottom: 20px;
-    box-shadow: var(--shadow-light);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 15px;
-}
-
-.selection-controls {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.selection-counter {
-    background: var(--primary-color);
-    color: white;
-    padding: 5px 12px;
-    border-radius: 20px;
-    font-size: 0.9em;
-    font-weight: 600;
-}
-
-.bulk-actions {
-    display: flex;
-    gap: 10px;
-}
-
-/* --- Messages Container --- */
-.messages-container {
-    flex: 1;
-    overflow-y: auto;
-    background: var(--card-background);
-    border-radius: var(--border-radius);
-    box-shadow: var(--shadow-light);
-    margin-top: 0; /* Bỏ margin-top mặc định nếu có */
-}
-
-.messages-list {
-    height: 100%;
-    overflow-y: auto;
-    padding: 15px;
-}
-
-/* --- Message Items --- */
-.message-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 15px;
-    padding: 15px;
-    border-bottom: 1px solid var(--border-light);
-    cursor: pointer;
-    transition: var(--transition-fast);
-    position: relative;
-}
-
-.message-item:hover {
-    background: var(--background-color);
-}
-
-.message-item.selected {
-    background: var(--primary-light);
-    border-left: 4px solid var(--primary-color);
-}
-
-.message-item.unread {
-    background: rgba(40, 167, 69, 0.05);
-    border-left: 4px solid var(--success-color);
-}
-
-.message-checkbox {
-    appearance: none;
-    width: 18px;
-    height: 18px;
-    border: 2px solid var(--primary-color);
-    border-radius: 4px;
-    cursor: pointer;
-    position: relative;
-    margin-top: 2px;
-    flex-shrink: 0;
-}
-
-.message-checkbox:checked {
-    background: var(--primary-color);
-}
-
-.message-checkbox:checked::after {
-    content: '✓';
-    position: absolute;
-    top: -2px;
-    left: 2px;
-    color: white;
-    font-weight: bold;
-    font-size: 12px;
-}
-
-.message-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 16px;
-    flex-shrink: 0;
-}
-
-.message-icon.inbox {
-    background: var(--gradient-success);
-}
-
-.message-icon.sent {
-    background: var(--gradient-primary);
-}
-
-.message-content {
-    flex: 1;
-    min-width: 0;
-}
-
-.message-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 5px;
-}
-
-.message-phone {
-    font-weight: 600;
-    color: var(--text-color);
-}
-
-.message-time {
-    font-size: 0.85em;
-    color: var(--text-secondary);
-}
-
-.message-text {
-    color: var(--text-color);
-    line-height: 1.5;
-    word-break: break-word;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    margin-bottom: 8px;
-}
-
-.message-badges {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 5px;
-    align-items: center;
-}
-
-.message-actions {
-    display: flex;
-    gap: 5px;
-    opacity: 0;
-    transition: var(--transition-fast);
-}
-
-.message-item:hover .message-actions {
-    opacity: 1;
-}
-
-/* --- Badges --- */
-.badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 4px 8px;
-    font-size: 0.75em;
-    font-weight: 500;
-    border-radius: 12px;
-}
-
-.badge-inbox {
-    background: var(--success-color);
-    color: white;
-}
-
-.badge-sent {
-    background: var(--primary-color);
-    color: white;
-}
-
-.badge-success {
-    background: var(--success-color);
-    color: white;
-}
-
-.badge-primary {
-    background: var(--primary-color);
-    color: white;
-}
-
-.badge-info {
-    background: var(--info-color);
-    color: white;
-}
-
-.badge-warning {
-    background: var(--warning-color);
-    color: white;
-}
-
-.badge-secondary {
-    background: var(--text-secondary);
-    color: white;
-}
-
-/* --- Pagination --- */
-.pagination-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: var(--card-background);
-    padding: 15px 20px;
-    border-radius: var(--border-radius);
-    box-shadow: var(--shadow-light);
-    margin-top: 20px;
-    flex-wrap: wrap;
-    gap: 15px;
-}
-
-.pagination-info {
-    color: var(--text-secondary);
-    font-size: 0.9em;
-}
-
-.pagination-controls {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.pagination-nav {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-
-.page-btn {
-    background: var(--background-color);
-    border: 1px solid var(--border-color);
-    color: var(--text-color);
-    padding: 8px 12px;
-    border-radius: var(--border-radius-small);
-    cursor: pointer;
-    transition: var(--transition-fast);
-    min-width: 40px;
-    height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.page-btn:hover {
-    background: var(--primary-color);
-    color: white;
-    border-color: var(--primary-color);
-}
-
-.page-btn.active {
-    background: var(--primary-color);
-    color: white;
-    border-color: var(--primary-color);
-}
-
-.page-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-.page-numbers {
-    display: flex;
-    gap: 2px;
-}
-
-/* --- Modal --- */
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(5px);
-    animation: fadeIn 0.3s ease-out;
-}
-
-.modal-content {
-    background-color: var(--card-background);
-    margin: 5% auto;
-    padding: 0;
-    border-radius: var(--border-radius-large);
-    width: 90%;
-    max-width: 600px;
-    box-shadow: var(--shadow-heavy);
-    animation: slideInDown 0.3s ease-out;
-    overflow: hidden;
-}
-
-.modal-header {
-    background: var(--gradient-primary);
-    color: white;
-    padding: 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.modal-header h3 {
-    margin: 0;
-    font-weight: 600;
-}
-
-.close {
-    color: white;
-    font-size: 28px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: var(--transition-fast);
-}
-
-.close:hover {
-    opacity: 0.8;
-}
-
-.modal-body {
-    padding: 20px;
-}
-
-.message-detail-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px;
-}
-
-.detail-item {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-}
-
-.detail-item.full-width {
-    grid-column: 1 / -1;
-}
-
-.detail-item label {
-    font-weight: 600;
-    color: var(--text-secondary);
-    font-size: 0.9em;
-}
-
-.message-content-detail {
-    background: var(--background-color);
-    padding: 15px;
-    border-radius: var(--border-radius-small);
-    border-left: 4px solid var(--primary-color);
-    white-space: pre-wrap;
-    word-break: break-word;
-    max-height: 200px;
-    overflow-y: auto;
-}
-
-.modal-footer {
-    padding: 20px;
-    background: var(--background-color);
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-}
-
-/* --- Notifications --- */
-.new-message-notification {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background: var(--gradient-success);
-    color: white;
-    padding: 15px 20px;
-    border-radius: var(--border-radius);
-    box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    z-index: 1000;
-    animation: slideInRight 0.5s ease-out;
-    border: 2px solid rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(10px);
-    transition: var(--transition-medium);
-}
-
-.new-message-notification:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 30px rgba(40, 167, 69, 0.4);
-}
-
-.new-message-notification i {
-    animation: pulse 2s infinite;
-    font-size: 18px;
-}
-
-.dismiss-btn {
-    background: rgba(255, 255, 255, 0.2);
-    border: none;
-    color: white;
-    font-size: 18px;
-    cursor: pointer;
-    border-radius: 50%;
-    width: 25px;
-    height: 25px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: var(--transition-fast);
-}
-
-.dismiss-btn:hover {
-    background: rgba(255, 255, 255, 0.3);
-}
-
-.action-feedback {
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: var(--primary-color);
-    color: white;
-    padding: 12px 20px;
-    border-radius: 25px;
-    box-shadow: var(--shadow-medium);
-    z-index: 1000;
-    animation: slideUp 0.3s ease-out;
-}
-
-.action-feedback.success {
-    background: var(--success-color);
-}
-
-.action-feedback.error {
-    background: var(--danger-color);
-}
-
-.action-feedback.info {
-    background: var(--info-color);
-}
-
-/* --- Status Messages --- */
-.status-message {
-    padding: 15px;
-    border-radius: var(--border-radius-small);
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-weight: 500;
-}
-
-.status-message.success {
-    background: rgba(40, 167, 69, 0.1);
-    color: var(--success-color);
-    border: 1px solid rgba(40, 167, 69, 0.3);
-}
-
-.status-message.error {
-    background: rgba(220, 53, 69, 0.1);
-    color: var(--danger-color);
-    border: 1px solid rgba(220, 53, 69, 0.3);
-}
-
-.status-message.info {
-    background: rgba(23, 162, 184, 0.1);
-    color: var(--info-color);
-    border: 1px solid rgba(23, 162, 184, 0.3);
-}
-
-/* --- Utility Classes --- */
-.hidden {
-    display: none !important;
-}
-
-.text-center {
-    text-align: center;
-}
-
-.text-muted {
-    color: var(--text-muted);
-}
-
-.mt-0 { margin-top: 0; }
-.mt-1 { margin-top: 0.5rem; }
-.mt-2 { margin-top: 1rem; }
-.mt-3 { margin-top: 1.5rem; }
-
-.mb-0 { margin-bottom: 0; }
-.mb-1 { margin-bottom: 0.5rem; }
-.mb-2 { margin-bottom: 1rem; }
-.mb-3 { margin-bottom: 1.5rem; }
-
-.d-none { display: none; }
-.d-flex { display: flex; }
-.d-block { display: block; }
-
-.flex-wrap { flex-wrap: wrap; }
-.gap-2 { gap: 0.5rem; }
-
-/* --- Scrollbar Styling --- */
-/* Targeting scrollbars for specific scrollable elements */
-.messages-list::-webkit-scrollbar,
-.message-content-detail::-webkit-scrollbar,
-.send-sms-section::-webkit-scrollbar, /* Thêm cuộn cho section gửi tin nhắn */
-.messages-section::-webkit-scrollbar { /* Thêm cuộn cho section danh sách tin nhắn */
-    width: 6px;
-}
-
-.messages-list::-webkit-scrollbar-track,
-.message-content-detail::-webkit-scrollbar-track,
-.send-sms-section::-webkit-scrollbar-track,
-.messages-section::-webkit-scrollbar-track {
-    background: var(--background-color);
-    border-radius: 3px;
-}
-
-.messages-list::-webkit-scrollbar-thumb,
-.message-content-detail::-webkit-scrollbar-thumb,
-.send-sms-section::-webkit-scrollbar-thumb,
-.messages-section::-webkit-scrollbar-thumb {
-    background: var(--primary-color);
-    border-radius: 3px;
-}
-
-.messages-list::-webkit-scrollbar-thumb:hover,
-.message-content-detail::-webkit-scrollbar-thumb:hover,
-.send-sms-section::-webkit-scrollbar-thumb:hover,
-.messages-section::-webkit-scrollbar-thumb:hover {
-    background: var(--primary-hover-color);
-}
-
-
-/* --- Animations --- */
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-@keyframes slideInRight {
-    from {
-        transform: translateX(100%);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
-}
-
-@keyframes slideInDown {
-    from {
-        transform: translateY(-50px);
-        opacity: 0;
-    }
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
-}
-
-@keyframes slideUp {
-    from {
-        transform: translateX(-50%) translateY(100%);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(-50%) translateY(0);
-        opacity: 1;
-    }
-}
-
-@keyframes slideDown {
-    from {
-        max-height: 0;
-        opacity: 0;
-    }
-    to {
-        max-height: 500px; /* Giá trị này có thể cần điều chỉnh tùy theo nội dung */
-        opacity: 1;
-    }
-}
-
-@keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-}
-
-@keyframes spin {
-    0% { transform: translate(-50%, -50%) rotate(0deg); }
-    100% { transform: translate(-50%, -50%) rotate(360deg); }
-}
-
-@keyframes buttonClick {
-    0% { transform: scale(1); }
-    50% { transform: scale(0.95); }
-    100% { transform: scale(1); }
-}
-
-/* --- Responsive Design --- */
-/* Base max-height for scrollable sections */
-:root {
-    --scrollable-section-max-height: calc(100vh - 80px - 80px - 20px - 20px); /* Header(80) + Toolbar(80) + MainPadding(20) + SectionPadding(20) */
-}
-
-.send-sms-section,
-.messages-section {
-    max-height: var(--scrollable-section-max-height);
-    overflow-y: auto;
-}
-
-@media (max-width: 1024px) {
-    .search-filter-toolbar {
-        padding: 10px 15px;
-    }
-    .content-grid {
-        grid-template-columns: 1fr;
-        gap: 15px;
-        padding-top: 0; /* Bỏ padding top khi layout 1 cột */
-    }
+        // Global variables
+        const API_BASE_URL = `${window.location.protocol}//${window.location.hostname}:8888/cgi-bin`;
+        let messages = [];
+        let allMessages = [];
+        let originalMessages = [];
+        let selectedMessages = new Set();
+        let currentMessageId = null;
+        let lastMessageCount = 0;
+        let autoRefreshInterval = null;
+        let isAutoRefreshEnabled = false;
+        
+        // Pagination variables
+        let currentPage = 1;
+        let itemsPerPage = 20;
+        let totalPages = 1;
+        
+        // Search timeout
+        let searchTimeout;
+        
+        // Unread messages tracking
+        let unreadMessages = new Set();
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            loadMessages();
+            initializeEventListeners();
+            requestNotificationPermission();
+            
+            // Load unread messages from localStorage
+            const saved = localStorage.getItem('unreadMessages');
+            if (saved) {
+                unreadMessages = new Set(JSON.parse(saved));
+            }
+        });
+
+        // Event listeners
+        function initializeEventListeners() {
+            // Keyboard shortcuts
+            document.addEventListener('keydown', function(e) {
+                if (e.ctrlKey && e.key === 'Enter') {
+                    sendSms();
+                }
+                if (e.key === 'Escape') {
+                    closeModal();
+                }
+                if (e.ctrlKey && e.key === 'a') {
+                    e.preventDefault();
+                    selectAllMessages();
+                }
+                if (e.key === 'Delete' && selectedMessages.size > 0) {
+                    deleteSelectedMessages();
+                }
+            });
+
+            // Modal close on outside click
+            window.onclick = function(event) {
+                const modal = document.getElementById('messageModal');
+                if (event.target === modal) {
+                    closeModal();
+                }
+            }
+
+            // Ctrl+Click for multi-select
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('message-item') && e.ctrlKey) {
+                    const checkbox = e.target.querySelector('.message-checkbox');
+                    if (checkbox) {
+                        checkbox.checked = !checkbox.checked;
+                        const messageId = checkbox.getAttribute('data-message-id');
+                        toggleMessageSelection(messageId, checkbox);
+                        e.target.classList.toggle('selected');
+                    }
+                }
+            });
+        }
+
+        // Character count update
+        function updateCharCount() {
+            const textarea = document.getElementById('messageText');
+            const counter = document.getElementById('charCount');
+            const current = textarea.value.length;
+            counter.textContent = `(${current}/160)`;
+            
+            if (current > 140) {
+                counter.style.color = 'var(--warning-color)';
+            } else if (current > 160) {
+                counter.style.color = 'var(--danger-color)';
+            } else {
+                counter.style.color = 'var(--text-muted)';
+            }
+        }
+
+        // Send SMS function
+        async function sendSms() {
+            const phoneNumber = document.getElementById('phoneNumber').value.trim();
+            const messageText = document.getElementById('messageText').value.trim();
+            const sendButton = document.getElementById('sendButton');
+            
+            if (!phoneNumber || !messageText) {
+                showStatusMessage('Vui lòng nhập đầy đủ số điện thoại và nội dung tin nhắn.', 'error');
+                return;
+            }
+            
+            if (!isValidPhoneNumber(phoneNumber)) {
+                showStatusMessage('Số điện thoại không hợp lệ. Vui lòng kiểm tra lại.', 'error');
+                return;
+            }
+            
+            try {
+                setButtonLoading(sendButton, true);
+                sendButton.classList.add('btn-click-effect');
+                
+                const url = `${API_BASE_URL}/sms-send?number=${encodeURIComponent(phoneNumber)}&text=${encodeURIComponent(messageText)}`;
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                // Lấy response text trước
+                const responseText = await response.text();
+                console.log('Raw response:', responseText);
+                
+                // Parse JSON từ response
+                let result;
+                try {
+                    result = JSON.parse(responseText);
+                } catch (parseError) {
+                    console.error('JSON parse error:', parseError);
+                    console.log('Response was:', responseText);
+                    throw new Error('Server trả về dữ liệu không hợp lệ');
+                }
+                
+                // Xử lý kết quả dựa trên JSON response
+                if (result.status === 'success') {
+                    showStatusMessage('Tin nhắn đã được gửi thành công!', 'success');
+                    showActionFeedback(`Đã gửi đến ${result.number}`, 'success');
+                    clearForm();
+                    
+                    // Reload messages after short delay
+                    setTimeout(() => {
+                        loadMessages();
+                    }, 1000);
+                    
+                } else if (result.status === 'error') {
+                    // Xử lý các loại lỗi cụ thể
+                    const errorMessage = getDetailedErrorMessage(result);
+                    showStatusMessage(errorMessage, 'error');
+                    showActionFeedback('Có lỗi xảy ra khi gửi tin nhắn!', 'error');
+                    
+                    // Log chi tiết lỗi để debug
+                    console.error('SMS send error:', {
+                        message: result.message,
+                        detail: result.detail,
+                        signal: result.signal,
+                        registration: result.registration
+                    });
+                } else {
+                    throw new Error('Phản hồi từ server không xác định');
+                }
+                
+            } catch (error) {
+                console.error('Error sending SMS:', error);
+                
+                if (error.name === 'TypeError' && error.message.includes('fetch')) {
+                    showStatusMessage('Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.', 'error');
+                } else {
+                    showStatusMessage(`Lỗi gửi tin nhắn: ${error.message}`, 'error');
+                }
+                showActionFeedback('Có lỗi xảy ra khi gửi tin nhắn!', 'error');
+            } finally {
+                setButtonLoading(sendButton, false);
+                setTimeout(() => sendButton.classList.remove('btn-click-effect'), 150);
+            }
+        }
+        
+        // Function hỗ trợ để xử lý error message chi tiết
+        function getDetailedErrorMessage(result) {
+            const errorDetail = result.detail || '';
+            
+            // Các lỗi phổ biến và thông báo thân thiện
+            if (errorDetail.includes('signal')) {
+                return 'Tín hiệu mạng quá yếu, không thể gửi SMS. Vui lòng thử lại sau.';
+            }
+            
+            if (errorDetail.includes('registration')) {
+                return 'Thiết bị chưa kết nối được với mạng di động. Vui lòng kiểm tra SIM và thử lại.';
+            }
+            
+            if (errorDetail.includes('GDBus.Error:org.freedesktop.libmbim.Error.Status.Failure')) {
+                return 'Lỗi kết nối với modem. Có thể do: tín hiệu yếu, SIM bị khóa, hoặc hết tiền. Vui lòng kiểm tra và thử lại.';
+            }
+            
+            if (errorDetail.includes('Couldn\'t send SMS part')) {
+                return 'Không thể gửi tin nhắn. Vui lòng kiểm tra: tín hiệu mạng, trạng thái SIM, và số dư tài khoản.';
+            }
+            
+            if (errorDetail.includes('SMS center')) {
+                return 'Lỗi cấu hình trung tâm tin nhắn. Vui lòng liên hệ quản trị viên.';
+            }
+            
+            // Lỗi từ server script
+            if (result.message === 'Không tìm thấy modem đang hoạt động') {
+                return 'Không tìm thấy thiết bị modem. Vui lòng kiểm tra kết nối USB và thử lại.';
+            }
+            
+            if (result.message === 'Thiếu số điện thoại hoặc nội dung') {
+                return 'Dữ liệu không hợp lệ. Vui lòng nhập lại số điện thoại và nội dung tin nhắn.';
+            }
+            
+            // Default message
+            return result.message || 'Có lỗi không xác định khi gửi tin nhắn. Vui lòng thử lại.';
+        }
+        
+        // Function hiển thị chi tiết lỗi cho admin/debug
+        function showDebugInfo(result) {
+            if (result.detail || result.signal || result.registration) {
+                console.group('Debug Info');
+                console.log('Error detail:', result.detail);
+                console.log('Signal strength:', result.signal);
+                console.log('Registration state:', result.registration);
+                console.groupEnd();
+                
+                // Hiển thị debug info trong UI nếu cần (chỉ cho admin)
+                if (window.DEBUG_MODE) {
+                    const debugInfo = [
+                        result.signal ? `Tín hiệu: ${result.signal}` : null,
+                        result.registration ? `Trạng thái mạng: ${result.registration}` : null,
+                        result.detail ? `Chi tiết lỗi: ${result.detail}` : null
+                    ].filter(Boolean).join(' | ');
+                    
+                    showStatusMessage(`${result.message} (${debugInfo})`, 'error');
+                }
+            }
+        }
+
+
+        // Phone number validation
+        function isValidPhoneNumber(phone) {
+            const cleaned = phone.replace(/\D/g, '');
+            return cleaned.length >= 10 && cleaned.length <= 11 && /^[0-9]+$/.test(cleaned);
+        }
+
+        // Load messages function
+        async function loadMessages() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/sms-read`);
+                const data = await response.text();
+                
+                if (response.ok) {
+                    const parsedMessages = parseSmsData(data);
+                    originalMessages = parsedMessages;
+                    allMessages = [...parsedMessages];
+                    
+                    // Check for new messages
+                    checkForNewMessages(parsedMessages);
+                    
+                    // Reset to first page and update
+                    currentPage = 1;
+                    updatePagination();
+                    
+                    updateLastLoadTime();
+                } else {
+                    throw new Error('Không thể tải tin nhắn');
+                }
+            } catch (error) {
+                console.error('Error loading messages:', error);
+                showActionFeedback('Không thể tải tin nhắn. Vui lòng thử lại.', 'error');
+                
+                // Show error state in messages list
+                document.getElementById('messagesList').innerHTML = `
+                    <div class="text-center text-muted mt-3">
+                        <i class="fas fa-exclamation-triangle fa-3x mb-2"></i>
+                        <p>Không thể tải tin nhắn. Vui lòng thử lại.</p>
+                        <button onclick="loadMessages()" class="btn btn-primary btn-sm">
+                            <i class="fas fa-sync-alt"></i> Thử lại
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        // Parse SMS JSON data
+        function parseSmsData(data) {
+            const messages = [];
+            
+            try {
+                // Parse JSON response
+                const jsonData = JSON.parse(data);
+                
+                if (jsonData.error) {
+                    console.error('API Error:', jsonData.error);
+                    showActionFeedback('Lỗi API: ' + jsonData.error, 'error');
+                    return [];
+                }
+                
+                if (!jsonData.messages || !Array.isArray(jsonData.messages)) {
+                    console.warn('Invalid JSON format:', jsonData);
+                    return [];
+                }
+                
+                jsonData.messages.forEach((msg, index) => {
+                    try {
+                        // Map JSON fields to our internal format
+                        const mappedMessage = {
+                            id: msg.id.toString(),
+                            type: mapMessageType(msg.type, msg.state),
+                            phone: cleanPhoneNumber(msg.number),
+                            timestamp: msg.date,
+                            content: msg.text || '',
+                            isRead: !unreadMessages.has(msg.id.toString()),
+                            state: msg.state,
+                            storage: msg.storage || 'unknown',
+                            pduType: msg.type
+                        };
+                        
+                        messages.push(mappedMessage);
+                    } catch (error) {
+                        console.warn('Error parsing message:', msg, error);
+                    }
+                });
+                
+            } catch (error) {
+                console.error('Error parsing SMS JSON data:', error);
+                console.log('Raw data:', data);
+                return [];
+            }
+            
+            // Sort by timestamp (newest first)
+            return messages.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        }
+
+        // Map message type
+        function mapMessageType(type, state) {
+            // Tin nhắn đến: type = "deliver", state = "received"
+            if (type === 'deliver' || state === 'received') {
+                return 'inbox';
+            }
+            // Tin nhắn gửi: type = "submit", state = "sent"
+            if (type === 'submit' || state === 'sent') {
+                return 'sent';
+            }
+            
+            // Fallback
+            return type === 'deliver' ? 'inbox' : 'sent';
+        }
+
+        // Clean phone number
+        function cleanPhoneNumber(number) {
+            if (!number) return '';
+            
+            // Remove whitespace and special characters
+            let cleaned = number.replace(/\s+/g, '').trim();
+            
+            // Convert +84 to 0
+            if (cleaned.startsWith('+84')) {
+                cleaned = '0' + cleaned.substring(3);
+            }
+            
+            return cleaned;
+        }
+
+        // Check for new messages
+        function checkForNewMessages(newMessages) {
+            const currentCount = newMessages.length;
+            
+            if (currentCount > lastMessageCount && lastMessageCount > 0) {
+                const newCount = currentCount - lastMessageCount;
+                showNewMessageNotification(newCount);
+                
+                // Add new messages to unread set
+                newMessages.slice(0, newCount).forEach(msg => {
+                    if (msg.type === 'inbox') {
+                        unreadMessages.add(msg.id.toString());
+                    }
+                });
+                
+                // Save to localStorage
+                localStorage.setItem('unreadMessages', JSON.stringify([...unreadMessages]));
+            }
+            
+            lastMessageCount = currentCount;
+        }
+
+        // Show new message notification
+        function showNewMessageNotification(count) {
+            const notification = document.getElementById('newMessageNotification');
+            const text = document.getElementById('notificationText');
+            const sound = document.getElementById('notificationSound');
+            
+            text.textContent = `Bạn có ${count} tin nhắn mới!`;
+            notification.classList.remove('hidden');
+            
+            // Play notification sound
+            sound.play().catch(e => console.log('Không thể phát âm thanh:', e));
+            
+            // Auto hide after 5 seconds
+            setTimeout(() => {
+                notification.classList.add('hidden');
+            }, 5000);
+        }
+
+        // Dismiss notification
+        function dismissNotification() {
+            document.getElementById('newMessageNotification').classList.add('hidden');
+        }
+
+        // Request notification permission
+        async function requestNotificationPermission() {
+            if (!('Notification' in window)) return;
+            
+            try {
+                const permission = await Notification.requestPermission();
+                if (permission === 'granted') {
+                    console.log('Push notifications enabled');
+                }
+            } catch (error) {
+                console.log('Push notifications not supported:', error);
+            }
+        }
+
+        // Show browser notification
+        function showBrowserNotification(title, body) {
+            if (window.Notification && Notification.permission === 'granted') {
+                new Notification(title, {
+                    body: body,
+                    icon: '/favicon.ico',
+                    badge: '/favicon.ico'
+                });
+            }
+        }
+
+        // Render messages for current page
+        function displayCurrentPageMessages() {
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const pageMessages = allMessages.slice(start, end);
+            
+            renderMessages(pageMessages);
+        }
+
+        // Render messages
+        function renderMessages(messagesToRender) {
+            const container = document.getElementById('messagesList');
+            
+            if (messagesToRender.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-muted mt-3">
+                        <i class="fas fa-inbox fa-3x mb-2"></i>
+                        <p>Không có tin nhắn nào.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const messagesHTML = messagesToRender.map(message => {
+                const isUnread = unreadMessages.has(message.id.toString());
+                const iconClass = message.type === 'inbox' ? 'fa-arrow-down' : 'fa-arrow-up';
+                const typeClass = message.type === 'inbox' ? 'inbox' : 'sent';
+                const typeText = message.type === 'inbox' ? 'Đến' : 'Gửi';
+                
+                // Truncate long messages for display
+                const displayText = message.content.length > 100 
+                    ? message.content.substring(0, 100) + '...' 
+                    : message.content;
+                
+                // Format storage info
+                const storageInfo = message.storage && message.storage !== 'unknown' 
+                    ? `<span class="badge badge-info" title="Lưu trữ: ${message.storage}">
+                        <i class="fas fa-hdd"></i> ${message.storage.toUpperCase()}
+                       </span>` 
+                    : '';
+                
+                return `
+                    <div class="message-item ${isUnread ? 'unread' : ''}" 
+                         data-id="${message.id}"
+                         data-phone="${message.phone}"
+                         data-time="${message.timestamp}"
+                         data-type="${message.type}"
+                         data-content="${message.content.replace(/"/g, '&quot;')}"
+                         onclick="showMessageDetail(this)">
+                        
+                        <input type="checkbox" 
+                               class="message-checkbox" 
+                               data-message-id="${message.id}"
+                               onchange="toggleMessageSelection('${message.id}', this)"
+                               onclick="event.stopPropagation()">
+                        
+                        <div class="message-icon ${typeClass}">
+                            <i class="fas ${iconClass}"></i>
+                        </div>
+                        
+                        <div class="message-content">
+                            <div class="message-header">
+                                <span class="message-phone">
+                                    <i class="fas fa-phone"></i>
+                                    ${message.phone}
+                                </span>
+                                <span class="message-time">
+                                    <i class="fas fa-clock"></i>
+                                    ${formatTimestamp(message.timestamp)}
+                                </span>
+                            </div>
+                            <div class="message-text" title="${message.content}">
+                                ${displayText}
+                            </div>
+                            <div class="message-badges mt-1">
+                                <span class="badge badge-${typeClass}">${typeText}</span>
+                                ${isUnread ? '<span class="badge badge-success">Mới</span>' : ''}
+                                ${storageInfo}
+                                <span class="badge badge-secondary" title="Trạng thái: ${message.state}">
+                                    <i class="fas fa-info-circle"></i> ${message.state}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="message-actions">
+                            <button onclick="event.stopPropagation(); showMessageDetail(this.closest('.message-item'))" 
+                                    class="btn btn-outline btn-xs" title="Xem chi tiết">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            ${message.type === 'inbox' ? `
+                                <button onclick="event.stopPropagation(); replyToMessage('${message.phone}')" 
+                                        class="btn btn-primary btn-xs" title="Trả lời">
+                                    <i class="fas fa-reply"></i>
+                                </button>
+                            ` : ''}
+                            <button onclick="event.stopPropagation(); deleteMessage('${message.id}')" 
+                                    class="btn btn-danger btn-xs" title="Xóa">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            container.innerHTML = messagesHTML;
+        }
+
+// Cập nhật hàm formatTimestamp
+function formatTimestamp(timestamp) {
+    if (!timestamp) return 'N/A';
     
-    /* Điều chỉnh max-height khi chuyển sang layout 1 cột */
-    :root {
-        --scrollable-section-max-height: calc(100vh - 60px - 80px - 15px - 15px); /* Header(60) + Toolbar(80) + MainPadding(15) + SectionPadding(15) */
-    }
-
-    .messages-section {
-        padding-left: 0; /* Xóa padding trái */
-    }
-    
-    .search-filter-toolbar {
-        padding: 10px;
-        margin-bottom: 15px;
-    }
-    .search-container {
-        flex-direction: column;
-        align-items: stretch;
-        padding: 15px; /* Thêm padding */
-    }
-    .search-box {
-        min-width: auto;
-    }
-    .filter-row {
-        grid-template-columns: 1fr;
-    }
-}
-
-@media (max-width: 768px) { /* Tiếp tục điều chỉnh cho điện thoại */
-    .app-header {
-        padding: 12px 15px;
-        flex-direction: column;
-        gap: 10px;
-        text-align: center;
-    }
-
-    .app-header h1 {
-        font-size: 1.3em;
-    }
-
-    .search-filter-toolbar { /* Toolbar sticky trên mobile */
-        padding: 10px;
-        margin-bottom: 15px;
-    }
-
-    .bulk-actions-toolbar,
-    .pagination-container {
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .selection-controls,
-    .bulk-actions {
-        justify-content: center;
-        flex-wrap: wrap;
-    }
-
-    .modal-content {
-        width: 95%;
-        margin: 2% auto;
-    }
-    .message-detail-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    /* Điều chỉnh max-height cho màn hình nhỏ */
-    :root {
-        --scrollable-section-max-height: calc(100vh - 50px - 70px - 10px - 10px); /* Header(50) + Toolbar(70) + MainPadding(10) + SectionPadding(10) */
+    try {
+        let date;
+        
+        // Normalize timestamp trước khi parse
+        let normalizedTimestamp = normalizeTimestamp(timestamp);
+        
+        // Xử lý các format timestamp khác nhau
+        if (normalizedTimestamp.includes('+07:00') || normalizedTimestamp.includes('+07')) {
+            // Format: "2025-07-21T00:51:25+07:00" hoặc "2025-07-21T00:37:29+07"
+            date = new Date(normalizedTimestamp);
+        } else if (normalizedTimestamp.match(/^\d{4}-\d{2}-\d{2}/)) {
+            // Format: "2025-07-21 00:51:25" (không có timezone)
+            date = new Date(normalizedTimestamp + '+07:00'); // Thêm timezone Việt Nam
+        } else if (normalizedTimestamp.match(/^\d{2}\/\d{2}\/\d{4}/)) {
+            // Format: "21/07/2025 00:51:25"
+            const parts = normalizedTimestamp.split(' ');
+            const dateParts = parts[0].split('/');
+            const timePart = parts[1] || '00:00:00';
+            date = new Date(`${dateParts[2]}-${dateParts[1]}-${dateParts[0]}T${timePart}+07:00`);
+        } else {
+            // Fallback: thử parse trực tiếp
+            date = new Date(normalizedTimestamp);
+        }
+        
+        // Kiểm tra date có hợp lệ không
+        if (isNaN(date.getTime())) {
+            console.warn('Invalid timestamp:', timestamp);
+            return timestamp; // Trả về raw timestamp nếu không parse được
+        }
+        
+        // Format hiển thị theo yêu cầu: 21/07/2025 - 00:21 AM
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        
+        // Format giờ với AM/PM
+        const hours24 = date.getHours();
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const hours12 = hours24 === 0 ? 12 : hours24 > 12 ? hours24 - 12 : hours24;
+        const ampm = hours24 >= 12 ? 'PM' : 'AM';
+        const hoursDisplay = String(hours12).padStart(2, '0');
+        
+        return `${day}/${month}/${year} - ${hoursDisplay}:${minutes} ${ampm}`;
+        
+    } catch (error) {
+        console.error('Error formatting timestamp:', timestamp, error);
+        return timestamp; // Fallback: trả về timestamp gốc
     }
 }
 
-@media (max-width: 480px) {
-    .main-content {
-        padding: 5px;
-    }
+		// Cập nhật hàm normalizeTimestamp
+		function normalizeTimestamp(timestamp) {
+			if (!timestamp) return null;
+			
+			// Xử lý timezone +07 -> +07:00
+			if (timestamp.includes('+07') && !timestamp.includes('+07:00')) {
+				timestamp = timestamp.replace(/\+07$/, '+07:00');
+			}
+			
+			// Xử lý timezone -07 -> -07:00 (nếu có)
+			if (timestamp.includes('-07') && !timestamp.includes('-07:00')) {
+				timestamp = timestamp.replace(/-07$/, '-07:00');
+			}
+			
+			return timestamp;
+		}
 
-    .card-body {
-        padding: 15px;
-    }
+		// Hàm format cho modal (hiển thị đầy đủ hơn)
+		function formatTimestampFull(timestamp) {
+			if (!timestamp) return 'N/A';
+			
+			try {
+				let normalizedTimestamp = normalizeTimestamp(timestamp);
+				let date = new Date(normalizedTimestamp);
+				
+				if (isNaN(date.getTime())) {
+					return timestamp;
+				}
+				
+				// Format đầy đủ cho modal: "Thứ Hai, 21/07/2025 - 00:21:53 AM"
+				const weekdays = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
+				const weekday = weekdays[date.getDay()];
+				
+				const day = String(date.getDate()).padStart(2, '0');
+				const month = String(date.getMonth() + 1).padStart(2, '0');
+				const year = date.getFullYear();
+				
+				const hours24 = date.getHours();
+				const minutes = String(date.getMinutes()).padStart(2, '0');
+				const seconds = String(date.getSeconds()).padStart(2, '0');
+				const hours12 = hours24 === 0 ? 12 : hours24 > 12 ? hours24 - 12 : hours24;
+				const ampm = hours24 >= 12 ? 'PM' : 'AM';
+				const hoursDisplay = String(hours12).padStart(2, '0');
+				
+				return `${weekday}, ${day}/${month}/${year} - ${hoursDisplay}:${minutes}:${seconds} ${ampm}`;
+				
+			} catch (error) {
+				console.error('Error formatting full timestamp:', timestamp, error);
+				return timestamp;
+			}
+		}
 
-    .message-item {
-        padding: 12px;
-    }
 
-    .btn {
-        padding: 10px 15px;
-        font-size: 13px;
-    }
+		// Cập nhật hàm showMessageDetail
+		function showMessageDetail(messageElement) {
+			const modal = document.getElementById('messageModal');
+			const phone = messageElement.getAttribute('data-phone');
+			const time = messageElement.getAttribute('data-time');
+			const type = messageElement.getAttribute('data-type');
+			const content = messageElement.getAttribute('data-content');
+			const messageId = messageElement.getAttribute('data-id');
+			
+			currentMessageId = messageId;
+			
+			document.getElementById('modalPhone').textContent = phone;
+			
+			// Sử dụng format đầy đủ cho modal
+			document.getElementById('modalTime').textContent = formatTimestampFull(time);
+			
+			document.getElementById('modalType').innerHTML = `
+				<span class="badge badge-${type}">${type === 'inbox' ? 'Tin nhắn đến' : 'Tin nhắn gửi'}</span>
+			`;
+			document.getElementById('modalContent').textContent = content;
+			
+			// Mark as read
+			if (unreadMessages.has(messageId)) {
+				unreadMessages.delete(messageId);
+				localStorage.setItem('unreadMessages', JSON.stringify([...unreadMessages]));
+				messageElement.classList.remove('unread');
+			}
+			
+			// Show detailed status
+			const statusElement = document.getElementById('modalStatus');
+			statusElement.innerHTML = getDetailedStatus(type, messageElement);
+			
+			modal.style.display = 'block';
+			document.body.style.overflow = 'hidden';
+		}
 
-    .btn-xs {
-        padding: 3px 6px;
-        font-size: 11px;
-    }
-    
-    /* Điều chỉnh lại max-height cho màn hình nhỏ hơn nữa */
-    :root {
-        --scrollable-section-max-height: calc(100vh - 50px - 60px - 10px - 10px); /* Điều chỉnh cho phù hợp */
-    }
-}
+
+        // Get detailed status
+        function getDetailedStatus(type, messageElement) {
+            const messageId = messageElement.getAttribute('data-id');
+            const isUnread = messageElement.classList.contains('unread');
+            
+            // Find message data from allMessages array
+            const messageData = allMessages.find(msg => msg.id.toString() === messageId);
+            
+            let statusHTML = '';
+            
+            if (type === 'inbox') {
+                statusHTML = `
+                    <span class="badge badge-success">
+                        <i class="fas fa-arrow-down"></i>
+                        Tin nhắn đến
+                    </span>
+                    <span class="badge badge-${isUnread ? 'warning' : 'info'}">
+                        <i class="fas fa-${isUnread ? 'envelope' : 'envelope-open'}"></i>
+                        ${isUnread ? 'Chưa đọc' : 'Đã đọc'}
+                    </span>
+                `;
+            } else {
+                statusHTML = `
+                    <span class="badge badge-primary">
+                        <i class="fas fa-arrow-up"></i>
+                        Tin nhắn gửi
+                    </span>
+                    <span class="badge badge-success">
+                        <i class="fas fa-check-circle"></i>
+                        Đã gửi thành công
+                    </span>
+                `;
+            }
+            
+            // Add storage information if available
+            if (messageData && messageData.storage && messageData.storage !== 'unknown') {
+                statusHTML += `
+                    <span class="badge badge-info">
+                        <i class="fas fa-hdd"></i>
+                        Lưu tại: ${messageData.storage.toUpperCase()}
+                    </span>
+                `;
+            }
+            
+            return statusHTML;
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('messageModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+            currentMessageId = null;
+        }
+
+        // Reply to message
+        function replyToMessage(phoneNumber) {
+            if (!phoneNumber) {
+                phoneNumber = document.getElementById('modalPhone').textContent;
+            }
+            
+            document.getElementById('phoneNumber').value = phoneNumber || '';
+            document.getElementById('messageText').focus();
+            closeModal();
+            
+            // Scroll to send form
+            document.querySelector('.send-sms-section').scrollIntoView({ 
+                behavior: 'smooth' 
+            });
+            
+            showActionFeedback(`Đã điền số ${phoneNumber} vào form gửi tin nhắn`, 'info');
+        }
+
+        // Multi-select functions
+        function toggleMessageSelection(messageId, checkbox) {
+            if (checkbox.checked) {
+                selectedMessages.add(messageId);
+                checkbox.closest('.message-item').classList.add('selected');
+            } else {
+                selectedMessages.delete(messageId);
+                checkbox.closest('.message-item').classList.remove('selected');
+            }
+            updateSelectionUI();
+        }
+
+        function selectAllMessages() {
+            const checkboxes = document.querySelectorAll('.message-checkbox');
+            checkboxes.forEach(cb => {
+                cb.checked = true;
+                const messageId = cb.getAttribute('data-message-id');
+                selectedMessages.add(messageId);
+                cb.closest('.message-item').classList.add('selected');
+            });
+            updateSelectionUI();
+        }
+
+        function deselectAllMessages() {
+            selectedMessages.clear();
+            const checkboxes = document.querySelectorAll('.message-checkbox');
+            checkboxes.forEach(cb => {
+                cb.checked = false;
+                cb.closest('.message-item').classList.remove('selected');
+            });
+            updateSelectionUI();
+        }
+
+        function updateSelectionUI() {
+            const count = selectedMessages.size;
+            const selectionCount = document.getElementById('selectionCount');
+            const bulkActions = document.getElementById('bulkActions');
+            const selectAllBtn = document.getElementById('selectAllBtn');
+            const deselectAllBtn = document.getElementById('deselectAllBtn');
+            
+            selectionCount.textContent = `${count} tin nhắn được chọn`;
+            
+            if (count > 0) {
+                bulkActions.style.display = 'flex';
+                selectAllBtn.style.display = 'none';
+                deselectAllBtn.style.display = 'inline-flex';
+            } else {
+                bulkActions.style.display = 'none';
+                selectAllBtn.style.display = 'inline-flex';
+                deselectAllBtn.style.display = 'none';
+            }
+        }
+
+        // Delete functions
+	// Cập nhật hàm deleteMessage
+		async function deleteMessage(messageId) {
+			if (!confirm('Bạn có chắc chắn muốn xóa tin nhắn này?')) return;
+			
+			try {
+				const response = await fetch(`${API_BASE_URL}/sms-delete?ids=${messageId}`);
+				const result = await response.json();
+				
+				if (response.ok && result.success) {
+					showActionFeedback(result.message || 'Đã xóa tin nhắn thành công!', 'success');
+					
+					// Remove from unread set
+					unreadMessages.delete(messageId.toString());
+					localStorage.setItem('unreadMessages', JSON.stringify([...unreadMessages]));
+					
+					loadMessages();
+					closeModal();
+				} else {
+					throw new Error(result.message || 'Không thể xóa tin nhắn');
+				}
+			} catch (error) {
+				console.error('Error deleting message:', error);
+				
+				// Try to parse as JSON if possible
+				let errorMessage = 'Không thể xóa tin nhắn. Vui lòng thử lại.';
+				try {
+					if (error.message) {
+						errorMessage = error.message;
+					}
+				} catch (parseError) {
+					// Use default message
+				}
+				
+				showActionFeedback(errorMessage, 'error');
+			}
+		}
+
+		// Cập nhật hàm deleteSelectedMessages
+		async function deleteSelectedMessages() {
+			if (selectedMessages.size === 0) {
+				showActionFeedback('Vui lòng chọn ít nhất một tin nhắn để xóa.', 'error');
+				return;
+			}
+			
+			if (!confirm(`Bạn có chắc chắn muốn xóa ${selectedMessages.size} tin nhắn đã chọn?`)) return;
+			
+			const deleteBtn = document.querySelector('#bulkActions .btn-danger');
+			
+			try {
+				setButtonLoading(deleteBtn, true);
+				
+				const ids = Array.from(selectedMessages).join(',');
+				const response = await fetch(`${API_BASE_URL}/sms-delete?ids=${ids}`);
+				const result = await response.json();
+				
+				if (response.ok && result.success) {
+					showActionFeedback(result.message || `Đã xóa ${selectedMessages.size} tin nhắn thành công!`, 'success');
+					
+					// Remove from unread set
+					selectedMessages.forEach(id => {
+						unreadMessages.delete(id.toString());
+					});
+					localStorage.setItem('unreadMessages', JSON.stringify([...unreadMessages]));
+					
+					selectedMessages.clear();
+					updateSelectionUI();
+					loadMessages();
+				} else {
+					// Handle partial success
+					if (result.deleted_count > 0) {
+						showActionFeedback(
+							`Xóa thành công ${result.deleted_count}/${result.total} tin nhắn. ${result.failed_count} tin nhắn không thể xóa.`, 
+							'warning'
+						);
+						
+						// Remove successfully deleted messages from selection and unread set
+						if (result.deleted && result.deleted.length > 0) {
+							result.deleted.forEach(id => {
+								selectedMessages.delete(id.toString());
+								unreadMessages.delete(id.toString());
+							});
+							localStorage.setItem('unreadMessages', JSON.stringify([...unreadMessages]));
+							updateSelectionUI();
+							loadMessages();
+						}
+					} else {
+						throw new Error(result.message || 'Không thể xóa tin nhắn nào');
+					}
+				}
+			} catch (error) {
+				console.error('Error deleting messages:', error);
+				
+				let errorMessage = 'Không thể xóa tin nhắn. Vui lòng thử lại.';
+				try {
+					if (error.message) {
+						errorMessage = error.message;
+					}
+				} catch (parseError) {
+					// Use default message
+				}
+				
+				showActionFeedback(errorMessage, 'error');
+			} finally {
+				setButtonLoading(deleteBtn, false);
+			}
+		}
+
+		// Thêm CSS cho warning feedback
+		const warningFeedbackStyle = `
+			<style>
+				.action-feedback.warning {
+					background: var(--warning-color);
+					color: white;
+				}
+				
+				.badge-warning {
+					background: var(--warning-color);
+					color: white;
+				}
+				
+				.status-message.warning {
+					background: rgba(255, 193, 7, 0.1);
+					color: var(--warning-color);
+					border: 1px solid rgba(255, 193, 7, 0.3);
+				}
+			</style>
+		`;
+
+		document.head.insertAdjacentHTML('beforeend', warningFeedbackStyle);
+
+        // Mark selected as read
+        function markSelectedAsRead() {
+            selectedMessages.forEach(messageId => {
+                unreadMessages.delete(messageId.toString());
+                const messageElement = document.querySelector(`[data-id="${messageId}"]`);
+                if (messageElement) {
+                    messageElement.classList.remove('unread');
+                }
+            });
+            
+            localStorage.setItem('unreadMessages', JSON.stringify([...unreadMessages]));
+            showActionFeedback(`Đã đánh dấu ${selectedMessages.size} tin nhắn là đã đọc!`, 'success');
+            
+            selectedMessages.clear();
+            updateSelectionUI();
+        }
+
+        // Search functions
+		// Cập nhật hàm performSearch với logic thời gian mới
+		function performSearch() {
+			clearTimeout(searchTimeout);
+			searchTimeout = setTimeout(() => {
+				const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+				const typeFilter = document.getElementById('typeFilter').value;
+				const dateFilter = document.getElementById('dateFilter').value;
+				const fromDate = document.getElementById('fromDate').value;
+				const toDate = document.getElementById('toDate').value;
+				const timeOfDayFilter = document.getElementById('timeOfDayFilter').value;
+				const readStatusFilter = document.getElementById('readStatusFilter').value;
+				
+				let filteredMessages = originalMessages;
+				
+				// Text search
+				if (searchTerm) {
+					filteredMessages = filteredMessages.filter(msg => 
+						msg.content.toLowerCase().includes(searchTerm) ||
+						msg.phone.toLowerCase().includes(searchTerm)
+					);
+				}
+				
+				// Type filter
+				if (typeFilter) {
+					filteredMessages = filteredMessages.filter(msg => msg.type === typeFilter);
+				}
+				
+				// Read status filter
+				if (readStatusFilter) {
+					filteredMessages = filteredMessages.filter(msg => {
+						const isUnread = unreadMessages.has(msg.id.toString());
+						return readStatusFilter === 'unread' ? isUnread : !isUnread;
+					});
+				}
+				
+				// Time of day filter
+				if (timeOfDayFilter) {
+					filteredMessages = filterByTimeOfDay(filteredMessages, timeOfDayFilter);
+				}
+				
+				// Date range filters
+				if (dateFilter) {
+					filteredMessages = filterByDateRange(filteredMessages, dateFilter);
+				}
+				
+				// Custom date range
+				if (fromDate || toDate) {
+					filteredMessages = filterByCustomDate(filteredMessages, fromDate, toDate);
+				}
+				
+				allMessages = filteredMessages;
+				currentPage = 1;
+				updatePagination();
+				
+				// Update UI feedback
+				updateFilterFeedback(filteredMessages.length, originalMessages.length, {
+					searchTerm, typeFilter, dateFilter, timeOfDayFilter, readStatusFilter
+				});
+				
+			}, 300);
+		}
+
+		// Hàm lọc theo giờ trong ngày
+		function filterByTimeOfDay(messages, timeFilter) {
+			return messages.filter(msg => {
+				try {
+					const date = new Date(normalizeTimestamp(msg.timestamp));
+					const hour = date.getHours();
+					
+					switch(timeFilter) {
+						case 'dawn': return hour >= 5 && hour < 8;     // 5:00-7:59
+						case 'morning': return hour >= 8 && hour < 12;  // 8:00-11:59
+						case 'afternoon': return hour >= 12 && hour < 18; // 12:00-17:59
+						case 'evening': return hour >= 18 && hour < 22;  // 18:00-21:59
+						case 'night': return hour >= 22 || hour < 5;     // 22:00-4:59
+						default: return true;
+					}
+				} catch (error) {
+					return true; // Keep message if can't parse time
+				}
+			});
+		}
+
+		// Cập nhật hàm filterByDateRange với logic thời gian chính xác
+		function filterByDateRange(messages, range) {
+			// Current time: Monday, July 21, 2025, 1:26 AM +07
+			const now = new Date('2025-07-21T01:26:00+07:00');
+			
+			return messages.filter(msg => {
+				try {
+					const msgDate = new Date(normalizeTimestamp(msg.timestamp));
+					
+					switch (range) {
+						case 'today': {
+							// 21/07/2025 từ 00:00 đến 23:59
+							const startOfToday = new Date('2025-07-21T00:00:00+07:00');
+							const endOfToday = new Date('2025-07-21T23:59:59+07:00');
+							return msgDate >= startOfToday && msgDate <= endOfToday;
+						}
+						
+						case 'yesterday': {
+							// 20/07/2025
+							const startOfYesterday = new Date('2025-07-20T00:00:00+07:00');
+							const endOfYesterday = new Date('2025-07-20T23:59:59+07:00');
+							return msgDate >= startOfYesterday && msgDate <= endOfYesterday;
+						}
+						
+						case 'thisWeek': {
+							// Tuần này (Monday 21/07 - Sunday 27/07)
+							const startOfWeek = new Date('2025-07-21T00:00:00+07:00'); // Monday
+							const endOfWeek = new Date('2025-07-27T23:59:59+07:00');   // Sunday
+							return msgDate >= startOfWeek && msgDate <= endOfWeek;
+						}
+						
+						case 'lastWeek': {
+							// Tuần trước (Monday 14/07 - Sunday 20/07)
+							const startOfLastWeek = new Date('2025-07-14T00:00:00+07:00');
+							const endOfLastWeek = new Date('2025-07-20T23:59:59+07:00');
+							return msgDate >= startOfLastWeek && msgDate <= endOfLastWeek;
+						}
+						
+						case 'thisMonth': {
+							// Tháng 7/2025
+							const startOfMonth = new Date('2025-07-01T00:00:00+07:00');
+							const endOfMonth = new Date('2025-07-31T23:59:59+07:00');
+							return msgDate >= startOfMonth && msgDate <= endOfMonth;
+						}
+						
+						case 'lastMonth': {
+							// Tháng 6/2025
+							const startOfLastMonth = new Date('2025-06-01T00:00:00+07:00');
+							const endOfLastMonth = new Date('2025-06-30T23:59:59+07:00');
+							return msgDate >= startOfLastMonth && msgDate <= endOfLastMonth;
+						}
+						
+						case 'last7days': {
+							// 7 ngày qua từ hiện tại
+							const sevenDaysAgo = new Date(now.getTime() - (7 * 24 * 60 * 60 * 1000));
+							return msgDate >= sevenDaysAgo && msgDate <= now;
+						}
+						
+						case 'last30days': {
+							// 30 ngày qua từ hiện tại
+							const thirtyDaysAgo = new Date(now.getTime() - (30 * 24 * 60 * 60 * 1000));
+							return msgDate >= thirtyDaysAgo && msgDate <= now;
+						}
+						
+						default:
+							return true;
+					}
+				} catch (error) {
+					console.error('Error in date filtering:', error);
+					return true;
+				}
+			});
+		}
+
+		// Quick filter functions
+		function setQuickFilter(filterType) {
+			// Reset all filters first
+			document.getElementById('searchInput').value = '';
+			document.getElementById('typeFilter').value = '';
+			document.getElementById('fromDate').value = '';
+			document.getElementById('toDate').value = '';
+			document.getElementById('timeOfDayFilter').value = '';
+			document.getElementById('readStatusFilter').value = '';
+			
+			switch(filterType) {
+				case 'today':
+					document.getElementById('dateFilter').value = 'today';
+					break;
+				case 'yesterday':
+					document.getElementById('dateFilter').value = 'yesterday';
+					break;
+				case 'thisWeek':
+					document.getElementById('dateFilter').value = 'thisWeek';
+					break;
+				case 'last24h':
+					document.getElementById('dateFilter').value = 'last7days';
+					break;
+				case 'unreadOnly':
+					document.getElementById('readStatusFilter').value = 'unread';
+					document.getElementById('dateFilter').value = '';
+					break;
+			}
+			
+			performSearch();
+			showActionFeedback(`Đã áp dụng bộ lọc: ${getFilterDisplayName(filterType)}`, 'info');
+		}
+
+		function clearAllFilters() {
+			document.getElementById('searchInput').value = '';
+			document.getElementById('typeFilter').value = '';
+			document.getElementById('dateFilter').value = '';
+			document.getElementById('fromDate').value = '';
+			document.getElementById('toDate').value = '';
+			document.getElementById('timeOfDayFilter').value = '';
+			document.getElementById('readStatusFilter').value = '';
+			document.getElementById('clearSearchBtn').style.display = 'none';
+			
+			allMessages = [...originalMessages];
+			currentPage = 1;
+			updatePagination();
+			
+			showActionFeedback('Đã xóa tất cả bộ lọc', 'success');
+		}
+
+		// Helper function
+		function getFilterDisplayName(filterType) {
+			const names = {
+				'today': 'Hôm nay',
+				'yesterday': 'Hôm qua', 
+				'thisWeek': 'Tuần này',
+				'last24h': '24 giờ qua',
+				'unreadOnly': 'Tin nhắn chưa đọc'
+			};
+			return names[filterType] || filterType;
+		}
+
+		// Enhanced feedback function
+		function updateFilterFeedback(filtered, total, filters) {
+			const activeFilters = [];
+			
+			if (filters.searchTerm) activeFilters.push(`"${filters.searchTerm}"`);
+			if (filters.typeFilter) activeFilters.push(filters.typeFilter === 'inbox' ? 'Tin đến' : 'Tin gửi');
+			if (filters.dateFilter) activeFilters.push(getFilterDisplayName(filters.dateFilter));
+			if (filters.timeOfDayFilter) activeFilters.push(filters.timeOfDayFilter);
+			if (filters.readStatusFilter) activeFilters.push(filters.readStatusFilter === 'unread' ? 'Chưa đọc' : 'Đã đọc');
+			
+			let message = `Tìm thấy ${filtered}/${total} tin nhắn`;
+			if (activeFilters.length > 0) {
+				message += ` với bộ lọc: ${activeFilters.join(', ')}`;
+			}
+			
+			if (filtered < total) {
+				showActionFeedback(message, 'info');
+			}
+		}
+
+
+        function filterByDateRange(messages, range) {
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            
+            return messages.filter(msg => {
+                const msgDate = new Date(msg.timestamp);
+                
+                switch (range) {
+                    case 'today':
+                        return msgDate >= today;
+                    case 'yesterday':
+                        const yesterday = new Date(today);
+                        yesterday.setDate(yesterday.getDate() - 1);
+                        return msgDate >= yesterday && msgDate < today;
+                    case 'week':
+                        const weekStart = new Date(today);
+                        weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+                        return msgDate >= weekStart;
+                    case 'month':
+                        const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+                        return msgDate >= monthStart;
+                    default:
+                        return true;
+                }
+            });
+        }
+
+        function filterByCustomDate(messages, fromDate, toDate) {
+            return messages.filter(msg => {
+                const msgDate = new Date(msg.timestamp);
+                const from = fromDate ? new Date(fromDate) : new Date('1970-01-01');
+                const to = toDate ? new Date(toDate + 'T23:59:59') : new Date();
+                
+                return msgDate >= from && msgDate <= to;
+            });
+        }
+
+        function showSearchResults(filtered, total) {
+            if (filtered < total) {
+                showActionFeedback(`Tìm thấy ${filtered} trong ${total} tin nhắn`, 'info');
+            }
+        }
+
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('typeFilter').value = '';
+            document.getElementById('dateFilter').value = '';
+            document.getElementById('fromDate').value = '';
+            document.getElementById('toDate').value = '';
+            
+            allMessages = [...originalMessages];
+            currentPage = 1;
+            updatePagination();
+            
+            document.getElementById('clearSearchBtn').style.display = 'none';
+        }
+
+        function toggleAdvancedSearch() {
+            const panel = document.getElementById('advancedSearchPanel');
+            const isVisible = panel.style.display !== 'none';
+            panel.style.display = isVisible ? 'none' : 'block';
+        }
+
+        // Filter messages by type
+        function filterMessages() {
+            const filter = document.getElementById('messageFilter').value;
+            
+            if (filter === 'all') {
+                allMessages = [...originalMessages];
+            } else {
+                allMessages = originalMessages.filter(msg => msg.type === filter);
+            }
+            
+            currentPage = 1;
+            updatePagination();
+        }
+
+        // Pagination functions
+        function updatePagination() {
+            totalPages = Math.ceil(allMessages.length / itemsPerPage);
+            
+            // Ensure current page is valid
+            if (currentPage > totalPages) currentPage = Math.max(1, totalPages);
+            
+            // Update info display
+            const start = allMessages.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0;
+            const end = Math.min(currentPage * itemsPerPage, allMessages.length);
+            
+            document.getElementById('itemStart').textContent = start;
+            document.getElementById('itemEnd').textContent = end;
+            document.getElementById('totalItems').textContent = allMessages.length;
+            
+            // Update button states
+            document.getElementById('firstPageBtn').disabled = currentPage === 1;
+            document.getElementById('prevPageBtn').disabled = currentPage === 1;
+            document.getElementById('nextPageBtn').disabled = currentPage === totalPages || totalPages === 0;
+            document.getElementById('lastPageBtn').disabled = currentPage === totalPages || totalPages === 0;
+            
+            // Render page numbers
+            renderPageNumbers();
+            
+            // Display messages for current page
+            displayCurrentPageMessages();
+        }
+
+        function renderPageNumbers() {
+            const pageNumbers = document.getElementById('pageNumbers');
+            pageNumbers.innerHTML = '';
+            
+            if (totalPages <= 1) return;
+            
+            const maxVisible = 5;
+            let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+            let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+            
+            if (endPage - startPage < maxVisible - 1) {
+                startPage = Math.max(1, endPage - maxVisible + 1);
+            }
+            
+            for (let i = startPage; i <= endPage; i++) {
+                const pageBtn = document.createElement('button');
+                pageBtn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
+                pageBtn.textContent = i;
+                pageBtn.onclick = () => goToPage(i);
+                pageNumbers.appendChild(pageBtn);
+            }
+        }
+
+        function goToPage(page) {
+            if (page >= 1 && page <= totalPages) {
+                currentPage = page;
+                updatePagination();
+                
+                // Scroll to top of messages list
+                document.querySelector('.messages-container').scrollTop = 0;
+            }
+        }
+
+        function changeItemsPerPage() {
+            itemsPerPage = parseInt(document.getElementById('itemsPerPage').value);
+            currentPage = 1;
+            updatePagination();
+        }
+
+        // Auto-refresh functions
+        function toggleAutoRefresh() {
+            const button = document.querySelector('#autoRefreshText');
+            
+            if (isAutoRefreshEnabled) {
+                clearInterval(autoRefreshInterval);
+                isAutoRefreshEnabled = false;
+                button.textContent = 'Bật tự động';
+                showActionFeedback('Đã tắt tự động tải lại', 'info');
+            } else {
+                autoRefreshInterval = setInterval(loadMessages, 30000); // 30 seconds
+                isAutoRefreshEnabled = true;
+                button.textContent = 'Tắt tự động';
+                showActionFeedback('Đã bật tự động tải lại (30 giây)', 'info');
+            }
+        }
+
+        // Export selected messages
+        function exportSelectedMessages() {
+            if (selectedMessages.size === 0) {
+                showActionFeedback('Vui lòng chọn ít nhất một tin nhắn để xuất.', 'error');
+                return;
+            }
+            
+            const selectedData = allMessages.filter(msg => selectedMessages.has(msg.id));
+            const csvContent = generateCSV(selectedData);
+            downloadCSV(csvContent, `sms_export_${new Date().toISOString().slice(0,10)}.csv`);
+            
+            showActionFeedback(`Đã xuất ${selectedMessages.size} tin nhắn!`, 'success');
+        }
+
+        function generateCSV(messages) {
+            const headers = ['Loại', 'Số điện thoại', 'Thời gian', 'Nội dung', 'Trạng thái', 'Lưu trữ'];
+            const rows = messages.map(msg => [
+                msg.type === 'inbox' ? 'Tin nhắn đến' : 'Tin nhắn gửi',
+                msg.phone,
+                new Date(msg.timestamp).toLocaleString('vi-VN'),
+                `"${msg.content.replace(/"/g, '""')}"`,
+                msg.state,
+                msg.storage || 'unknown'
+            ]);
+            
+            return [headers, ...rows].map(row => row.join(',')).join('\n');
+        }
+
+        function downloadCSV(content, filename) {
+            const blob = new Blob(['\ufeff' + content], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            link.click();
+            URL.revokeObjectURL(link.href);
+        }
+
+        // Utility functions
+        function showStatusMessage(message, type) {
+            const statusDiv = document.getElementById('statusMessage');
+            const span = statusDiv.querySelector('span');
+            
+            statusDiv.className = `status-message ${type}`;
+            span.textContent = message;
+            statusDiv.classList.remove('hidden');
+            
+            setTimeout(() => {
+                statusDiv.classList.add('hidden');
+            }, 5000);
+        }
+
+        function showActionFeedback(message, type = 'success') {
+            const feedback = document.createElement('div');
+            feedback.className = `action-feedback ${type}`;
+            feedback.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check' : type === 'error' ? 'exclamation-triangle' : 'info-circle'}"></i> 
+                ${message}
+            `;
+            
+            document.body.appendChild(feedback);
+            
+            setTimeout(() => {
+                feedback.remove();
+            }, 3000);
+        }
+
+        function setButtonLoading(button, isLoading) {
+            if (isLoading) {
+                button.classList.add('btn-loading');
+                button.disabled = true;
+                button.setAttribute('data-original-text', button.innerHTML);
+            } else {
+                button.classList.remove('btn-loading');
+                button.disabled = false;
+                if (button.getAttribute('data-original-text')) {
+                    button.innerHTML = button.getAttribute('data-original-text');
+                }
+            }
+        }
+
+        function clearForm() {
+            document.getElementById('phoneNumber').value = '';
+            document.getElementById('messageText').value = '';
+            updateCharCount();
+        }
+
+        function loadTemplate() {
+            const templates = [
+                'Xin chào, đây là tin nhắn mẫu từ hệ thống SMS Gateway.',
+                'Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi.',
+                'Thông báo: Bạn có một thông điệp quan trọng.',
+                'Nhắc nhở: Đừng quên cuộc hẹn của bạn vào ngày mai.'
+            ];
+            
+            const randomTemplate = templates[Math.floor(Math.random() * templates.length)];
+            document.getElementById('messageText').value = randomTemplate;
+            updateCharCount();
+        }
+
+        function updateLastLoadTime() {
+            const now = new Date();
+            console.log(`Đã tải tin nhắn lúc: ${now.toLocaleString('vi-VN')}`);
+        }
