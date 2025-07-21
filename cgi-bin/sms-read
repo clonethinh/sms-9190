@@ -1,0 +1,88 @@
+#!/bin/sh
+echo "Content-Type: application/json; charset=utf-8"
+echo ""
+
+# --- TÌM MODEM ---
+MODEM_ID=""
+for i in $(seq 0 9); do
+    if mmcli -m "$i" >/dev/null 2>&1; then
+        MODEM_ID="$i"
+        break
+    fi
+done
+
+if [ -z "$MODEM_ID" ]; then
+    echo '{ "error": "Không tìm thấy modem nào hoạt động.", "messages": [] }'
+    exit 1
+fi
+
+# --- ĐỌC DANH SÁCH SMS ---
+SMS_IDS=$(mmcli -m "$MODEM_ID" --messaging-list-sms 2>/dev/null | grep -E "(received|sent)" | awk -F '/' '{print $NF}')
+
+if [ -z "$SMS_IDS" ]; then
+    echo '{ "messages": [] }'
+    exit 0
+fi
+
+# --- TRẢ JSON ---
+echo -n '{ "messages": ['
+
+FIRST=1
+for ID in $SMS_IDS; do
+    INFO=$(mmcli -s "$ID" 2>/dev/null)
+    [ -z "$INFO" ] && continue
+    
+    # Clean text extraction - loại bỏ | và dấu -
+    TEXT=$(echo "$INFO" | awk '
+        /text:/ { 
+            found=1; 
+            sub(/.*text:[[:space:]]*/, ""); 
+            if ($0 != "") result=$0; 
+            next 
+        }
+        found && /Properties/ { found=0 }
+        found && !/^[[:space:]]*-+[[:space:]]*$/ { 
+            gsub(/^[[:space:]]*\|[[:space:]]*/, ""); 
+            gsub(/^[[:space:]]*-+[[:space:]]*$/, "");
+            if ($0 != "" && $0 !~ /^[[:space:]]*$/) {
+                if (result != "") result=result " " $0;
+                else result=$0;
+            }
+        }
+        END { 
+            gsub(/[[:space:]]+/, " ", result);
+            gsub(/^[[:space:]]+|[[:space:]]+$/, "", result);
+            gsub(/\\/, "\\\\", result);
+            gsub(/"/, "\\\"", result);
+            print result 
+        }')
+        
+    NUMBER=$(echo "$INFO" | grep -m 1 "number:" | sed 's/.*number:[[:space:]]*//')
+    
+    DATE=$(echo "$INFO" | grep -m 1 "timestamp:" | sed 's/.*timestamp:[[:space:]]*//')
+    if [ -z "$DATE" ]; then
+        DATE=$(date -Iseconds)
+    fi
+
+    TYPE=$(echo "$INFO" | grep -m 1 "pdu type:" | sed 's/.*pdu type:[[:space:]]*//')
+    STATE=$(echo "$INFO" | grep -m 1 "state:" | sed 's/.*state:[[:space:]]*//')
+    STORAGE=$(echo "$INFO" | grep -m 1 "storage:" | sed 's/.*storage:[[:space:]]*//')
+
+    [ -z "$TEXT" ] && continue
+
+    [ "$FIRST" -eq 0 ] && echo ","
+    FIRST=0
+
+    echo "{
+        \"id\": $ID,
+        \"number\": \"${NUMBER}\",
+        \"text\": \"${TEXT}\",
+        \"date\": \"${DATE}\",
+        \"type\": \"${TYPE}\",
+        \"state\": \"${STATE}\",
+        \"storage\": \"${STORAGE}\"
+    }"
+done
+
+echo '] }'
+
