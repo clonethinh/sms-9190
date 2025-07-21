@@ -1,0 +1,140 @@
+#!/bin/sh
+
+echo "Content-Type: application/json; charset=utf-8"
+echo ""
+
+# Lấy danh sách ID từ query string
+IDS=$(echo "$QUERY_STRING" | sed -n 's/^.*ids=\([^&]*\).*$/\1/p' | sed 's/%2C/,/g' | sed 's/%20/ /g')
+
+# Kiểm tra input
+if [ -z "$IDS" ]; then
+    echo '{"success": false, "message": "Không có ID tin nhắn để xóa", "deleted": [], "failed": [], "error": "missing_ids"}'
+    exit 1
+fi
+
+# --- Tìm modem tự động ---
+MODEM_ID=""
+MODEM_PATH=""
+for i in $(seq 0 9); do
+    if mmcli -m "$i" >/dev/null 2>&1; then
+        MODEM_ID="$i"
+        MODEM_PATH="/org/freedesktop/ModemManager1/Modem/$i"
+        break
+    fi
+done
+
+# Nếu không tìm thấy modem nào
+if [ -z "$MODEM_ID" ]; then
+    echo '{"success": false, "message": "Không tìm thấy modem nào hoạt động", "deleted": [], "failed": [], "error": "no_modem_found"}'
+    exit 1
+fi
+
+# Khởi tạo biến đếm và mảng kết quả
+DELETED_COUNT=0
+FAILED_COUNT=0
+TOTAL_COUNT=0
+DELETED_IDS=""
+FAILED_IDS=""
+DELETED_ARRAY="[]"
+FAILED_ARRAY="[]"
+
+# Xử lý từng ID
+IFS=','
+for ID in $IDS; do
+    # Loại bỏ khoảng trắng
+    ID=$(echo "$ID" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+    
+    # Bỏ qua ID rỗng
+    if [ -z "$ID" ]; then
+        continue
+    fi
+    
+    TOTAL_COUNT=$((TOTAL_COUNT + 1))
+    
+    # Thử xóa SMS với nhiều phương pháp
+    DELETE_SUCCESS=0
+    
+    # Phương pháp 1: Sử dụng đường dẫn đầy đủ
+    if [ $DELETE_SUCCESS -eq 0 ]; then
+        DELETE_RESULT=$(mmcli -m "$MODEM_PATH" --messaging-delete-sms="/org/freedesktop/ModemManager1/SMS/$ID" 2>&1)
+        if echo "$DELETE_RESULT" | grep -q "successfully deleted\|success"; then
+            DELETE_SUCCESS=1
+        fi
+    fi
+    
+    # Phương pháp 2: Sử dụng chỉ số modem
+    if [ $DELETE_SUCCESS -eq 0 ]; then
+        DELETE_RESULT=$(mmcli -m "$MODEM_ID" --messaging-delete-sms="$ID" 2>&1)
+        if echo "$DELETE_RESULT" | grep -q "successfully deleted\|success"; then
+            DELETE_SUCCESS=1
+        fi
+    fi
+    
+    # Phương pháp 3: Sử dụng mmcli -s trực tiếp
+    if [ $DELETE_SUCCESS -eq 0 ]; then
+        DELETE_RESULT=$(mmcli --messaging-delete-sms="$ID" 2>&1)
+        if echo "$DELETE_RESULT" | grep -q "successfully deleted\|success"; then
+            DELETE_SUCCESS=1
+        fi
+    fi
+    
+    # Ghi nhận kết quả
+    if [ $DELETE_SUCCESS -eq 1 ]; then
+        DELETED_COUNT=$((DELETED_COUNT + 1))
+        if [ -z "$DELETED_IDS" ]; then
+            DELETED_IDS="$ID"
+        else
+            DELETED_IDS="$DELETED_IDS,$ID"
+        fi
+    else
+        FAILED_COUNT=$((FAILED_COUNT + 1))
+        if [ -z "$FAILED_IDS" ]; then
+            FAILED_IDS="$ID"
+        else
+            FAILED_IDS="$FAILED_IDS,$ID"
+        fi
+    fi
+done
+
+# Tạo JSON arrays cho deleted và failed IDs
+if [ -n "$DELETED_IDS" ]; then
+    DELETED_ARRAY="[\"$(echo "$DELETED_IDS" | sed 's/,/","/g')\"]"
+fi
+
+if [ -n "$FAILED_IDS" ]; then
+    FAILED_ARRAY="[\"$(echo "$FAILED_IDS" | sed 's/,/","/g')\"]"
+fi
+
+# Tạo response message
+if [ $DELETED_COUNT -eq $TOTAL_COUNT ]; then
+    MESSAGE="Đã xóa thành công tất cả $DELETED_COUNT tin nhắn"
+    SUCCESS=true
+elif [ $DELETED_COUNT -gt 0 ]; then
+    MESSAGE="Đã xóa thành công $DELETED_COUNT/$TOTAL_COUNT tin nhắn"
+    SUCCESS=true
+else
+    MESSAGE="Không thể xóa tin nhắn nào ($FAILED_COUNT/$TOTAL_COUNT thất bại)"
+    SUCCESS=false
+fi
+
+# Trả về JSON response
+cat << EOF
+{
+    "success": $SUCCESS,
+    "message": "$MESSAGE",
+    "total": $TOTAL_COUNT,
+    "deleted_count": $DELETED_COUNT,
+    "failed_count": $FAILED_COUNT,
+    "deleted": $DELETED_ARRAY,
+    "failed": $FAILED_ARRAY,
+    "modem_id": "$MODEM_ID"
+}
+EOF
+
+# Set exit code
+if [ "$SUCCESS" = "true" ]; then
+    exit 0
+else
+    exit 1
+fi
+
