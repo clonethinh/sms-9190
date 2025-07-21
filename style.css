@@ -1183,8 +1183,32 @@ textarea.form-control {
         font-size: 11px;
     }
     
+    
     /* Điều chỉnh lại max-height cho màn hình nhỏ hơn nữa */
     :root {
         --scrollable-section-max-height: calc(100vh - 50px - 60px - 10px - 10px); /* Điều chỉnh cho phù hợp */
+    }
+    /* --- Footer responsive --- */
+    .footer-copyright {
+        background-color: #f4f4f4;
+        color: #333;
+        text-align: center;
+        padding: 15px 10px;
+        font-size: 14px;
+        font-family: 'Inter', sans-serif;
+        border-top: 1px solid #ddd;
+        margin-top: 30px;
+        box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.05);
+    }
+    
+    .footer-copyright a {
+        color: #007bff;
+        text-decoration: none;
+        font-weight: 500;
+    }
+    
+    .footer-copyright a:hover {
+        text-decoration: underline;
+        color: #0056b3;
     }
 }
