@@ -1,0 +1,44 @@
+#!/bin/sh
+echo "Content-Type: application/json"
+echo ""
+
+# ==== TÌM MODEM TỰ ĐỘNG ====
+MODEM_ID=$(mmcli -L 2>/dev/null | grep -o '/Modem/[0-9]\+' | head -n1 | awk -F/ '{print $NF}')
+
+if [ -z "$MODEM_ID" ]; then
+    echo '{ "status": "error", "message": "Không tìm thấy modem đang hoạt động" }'
+    exit 1
+fi
+
+DEVICE="/usr/bin/mmcli"
+
+# ==== GIẢI MÃ URL ====
+urldecode() {
+    echo -e "$(echo "$1" | sed 's/+/ /g; s/%/\\x/g')"
+}
+
+# ==== LẤY THÔNG SỐ ====
+NUMBER=$(echo "$QUERY_STRING" | sed -n 's/.*number=\([^&]*\).*/\1/p')
+TEXT=$(echo "$QUERY_STRING" | sed -n 's/.*text=\([^&]*\).*/\1/p')
+NUMBER=$(urldecode "$NUMBER")
+TEXT=$(urldecode "$TEXT")
+
+if [ -z "$NUMBER" ] || [ -z "$TEXT" ]; then
+    echo '{ "status": "error", "message": "Thiếu số điện thoại hoặc nội dung" }'
+    exit 1
+fi
+
+# ==== GỬI TIN NHẮN ====
+SMS_PATH=$($DEVICE -m "$MODEM_ID" --messaging-create-sms="number='$NUMBER',text='$TEXT'" 2>/dev/null | awk '/\/SMS\// {print $NF}')
+if [ -z "$SMS_PATH" ]; then
+    echo '{ "status": "error", "message": "Không tạo được SMS" }'
+    exit 1
+fi
+
+SEND_RESULT=$($DEVICE -s "$SMS_PATH" --send 2>&1)
+if echo "$SEND_RESULT" | grep -q "successfully sent"; then
+    DATE=$(date -Iseconds)
+    echo "{ \"status\": \"success\", \"message\": \"Đã gửi SMS\", \"number\": \"$NUMBER\", \"text\": \"$TEXT\", \"date\": \"$DATE\", \"type\": \"submit\", \"state\": \"sent\" }"
+else
+    echo "{ \"status\": \"error\", \"message\": \"Gửi thất bại\", \"detail\": \"$SEND_RESULT\" }"
+fi
