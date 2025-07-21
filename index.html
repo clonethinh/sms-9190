@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Quản lý Tin nhắn SMS - JSON API</title>
+    <title>Quản lý Tin nhắn SMS - EM919X 5G</title>
     
     <!-- Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -26,6 +26,114 @@
                 Đang hoạt động
             </div>
         </header>
+
+        <!-- Thanh tìm kiếm và bộ lọc nâng cao được đặt ở đây -->
+        <!-- Nó sẽ được cố định nhờ CSS -->
+        <div class="search-filter-toolbar">
+            <!-- Search Container -->
+            <div class="search-container">
+                <div class="search-box">
+                    <i class="fas fa-search search-icon"></i>
+                    <input 
+                        type="text" 
+                        id="searchInput" 
+                        placeholder="Tìm kiếm theo nội dung, số điện thoại..." 
+                        oninput="performSearch()"
+                    />
+                    <button 
+                        onclick="clearSearch()" 
+                        id="clearSearchBtn" 
+                        class="clear-search" 
+                        style="display: none;"
+                    >
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="search-filters">
+                    <button onclick="toggleAdvancedSearch()" class="btn btn-outline btn-sm">
+                        <i class="fas fa-filter"></i>
+                        Lọc nâng cao
+                    </button>
+                </div>
+            </div>
+
+            <!-- Advanced Search Panel -->
+            <div id="advancedSearchPanel" class="advanced-search-panel" style="display: none;">
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label><i class="fas fa-filter"></i> Loại tin nhắn:</label>
+                        <select id="typeFilter" class="form-control" onchange="performSearch()">
+                            <option value="">Tất cả tin nhắn</option>
+                            <option value="inbox">📥 Tin nhắn đến</option>
+                            <option value="sent">📤 Tin nhắn gửi</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label><i class="fas fa-clock"></i> Khoảng thời gian:</label>
+                        <select id="dateFilter" class="form-control" onchange="performSearch()">
+                            <option value="">Tất cả thời gian</option>
+                            <option value="today">🌅 Hôm nay (21/07/2025)</option>
+                            <option value="yesterday">🌄 Hôm qua (20/07/2025)</option>
+                            <option value="thisWeek">📅 Tuần này</option>
+                            <option value="lastWeek">📆 Tuần trước</option>
+                            <option value="thisMonth">🗓️ Tháng này (Tháng 7)</option>
+                            <option value="lastMonth">🗓️ Tháng trước (Tháng 6)</option>
+                            <option value="last7days">⏰ 7 ngày qua</option>
+                            <option value="last30days">⏰ 30 ngày qua</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label><i class="fas fa-calendar-alt"></i> Từ ngày:</label>
+                        <input type="date" id="fromDate" class="form-control" 
+                               onchange="performSearch()" 
+                               max="2025-07-21" />
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label><i class="fas fa-calendar-check"></i> Đến ngày:</label>
+                        <input type="date" id="toDate" class="form-control" 
+                               onchange="performSearch()" 
+                               max="2025-07-21" />
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label><i class="fas fa-business-time"></i> Giờ trong ngày:</label>
+                        <select id="timeOfDayFilter" class="form-control" onchange="performSearch()">
+                            <option value="">Mọi giờ</option>
+                            <option value="dawn">🌄 Rạng sáng (5:00-7:59)</option>
+                            <option value="morning">🌅 Buổi sáng (8:00-11:59)</option>
+                            <option value="afternoon">☀️ Buổi chiều (12:00-17:59)</option>
+                            <option value="evening">🌆 Buổi tối (18:00-21:59)</option>
+                            <option value="night">🌙 Ban đêm (22:00-4:59)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label><i class="fas fa-eye"></i> Trạng thái đọc:</label>
+                        <select id="readStatusFilter" class="form-control" onchange="performSearch()">
+                            <option value="">Tất cả</option>
+                            <option value="unread">✉️ Chưa đọc</option>
+                            <option value="read">📖 Đã đọc</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Quick time filters -->
+                <div class="quick-filters mt-3">
+                    <label class="filter-label"><i class="fas fa-lightning-bolt"></i> Lọc nhanh:</label>
+                    <div class="quick-filter-buttons">
+                        <button class="btn btn-outline btn-xs" onclick="setQuickFilter('today')">Hôm nay</button>
+                        <button class="btn btn-outline btn-xs" onclick="setQuickFilter('yesterday')">Hôm qua</button>
+                        <button class="btn btn-outline btn-xs" onclick="setQuickFilter('thisWeek')">Tuần này</button>
+                        <button class="btn btn-outline btn-xs" onclick="setQuickFilter('last24h')">24h qua</button>
+                        <button class="btn btn-outline btn-xs" onclick="setQuickFilter('unreadOnly')">Chưa đọc</button>
+                        <button class="btn btn-secondary btn-xs" onclick="clearAllFilters()">🗑️ Xóa bộ lọc</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- Main Content -->
         <main class="main-content">
@@ -120,111 +228,6 @@
 
                 <!-- Messages Section -->
                 <section class="messages-section">
-                    <!-- Search Container -->
-                    <div class="search-container">
-                        <div class="search-box">
-                            <i class="fas fa-search search-icon"></i>
-                            <input 
-                                type="text" 
-                                id="searchInput" 
-                                placeholder="Tìm kiếm theo nội dung, số điện thoại..." 
-                                oninput="performSearch()"
-                            />
-                            <button 
-                                onclick="clearSearch()" 
-                                id="clearSearchBtn" 
-                                class="clear-search" 
-                                style="display: none;"
-                            >
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
-                        <div class="search-filters">
-                            <button onclick="toggleAdvancedSearch()" class="btn btn-outline btn-sm">
-                                <i class="fas fa-filter"></i>
-                                Lọc nâng cao
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Advanced Search Panel -->
-					<div id="advancedSearchPanel" class="advanced-search-panel" style="display: none;">
-						<div class="filter-row">
-							<div class="filter-group">
-								<label><i class="fas fa-filter"></i> Loại tin nhắn:</label>
-								<select id="typeFilter" class="form-control" onchange="performSearch()">
-									<option value="">Tất cả tin nhắn</option>
-									<option value="inbox">📥 Tin nhắn đến</option>
-									<option value="sent">📤 Tin nhắn gửi</option>
-								</select>
-							</div>
-							
-							<div class="filter-group">
-								<label><i class="fas fa-clock"></i> Khoảng thời gian:</label>
-								<select id="dateFilter" class="form-control" onchange="performSearch()">
-									<option value="">Tất cả thời gian</option>
-									<option value="today">🌅 Hôm nay (21/07/2025)</option>
-									<option value="yesterday">🌄 Hôm qua (20/07/2025)</option>
-									<option value="thisWeek">📅 Tuần này</option>
-									<option value="lastWeek">📆 Tuần trước</option>
-									<option value="thisMonth">🗓️ Tháng này (Tháng 7)</option>
-									<option value="lastMonth">🗓️ Tháng trước (Tháng 6)</option>
-									<option value="last7days">⏰ 7 ngày qua</option>
-									<option value="last30days">⏰ 30 ngày qua</option>
-								</select>
-							</div>
-							
-							<div class="filter-group">
-								<label><i class="fas fa-calendar-alt"></i> Từ ngày:</label>
-								<input type="date" id="fromDate" class="form-control" 
-									   onchange="performSearch()" 
-									   max="2025-07-21" />
-							</div>
-							
-							<div class="filter-group">
-								<label><i class="fas fa-calendar-check"></i> Đến ngày:</label>
-								<input type="date" id="toDate" class="form-control" 
-									   onchange="performSearch()" 
-									   max="2025-07-21" />
-							</div>
-							
-							<div class="filter-group">
-								<label><i class="fas fa-business-time"></i> Giờ trong ngày:</label>
-								<select id="timeOfDayFilter" class="form-control" onchange="performSearch()">
-									<option value="">Mọi giờ</option>
-									<option value="dawn">🌄 Rạng sáng (5:00-7:59)</option>
-									<option value="morning">🌅 Buổi sáng (8:00-11:59)</option>
-									<option value="afternoon">☀️ Buổi chiều (12:00-17:59)</option>
-									<option value="evening">🌆 Buổi tối (18:00-21:59)</option>
-									<option value="night">🌙 Ban đêm (22:00-4:59)</option>
-								</select>
-							</div>
-							
-							<div class="filter-group">
-								<label><i class="fas fa-eye"></i> Trạng thái đọc:</label>
-								<select id="readStatusFilter" class="form-control" onchange="performSearch()">
-									<option value="">Tất cả</option>
-									<option value="unread">✉️ Chưa đọc</option>
-									<option value="read">📖 Đã đọc</option>
-								</select>
-							</div>
-						</div>
-						
-						<!-- Quick time filters -->
-						<div class="quick-filters mt-3">
-							<label class="filter-label"><i class="fas fa-lightning-bolt"></i> Lọc nhanh:</label>
-							<div class="quick-filter-buttons">
-								<button class="btn btn-outline btn-xs" onclick="setQuickFilter('today')">Hôm nay</button>
-								<button class="btn btn-outline btn-xs" onclick="setQuickFilter('yesterday')">Hôm qua</button>
-								<button class="btn btn-outline btn-xs" onclick="setQuickFilter('thisWeek')">Tuần này</button>
-								<button class="btn btn-outline btn-xs" onclick="setQuickFilter('last24h')">24h qua</button>
-								<button class="btn btn-outline btn-xs" onclick="setQuickFilter('unreadOnly')">Chưa đọc</button>
-								<button class="btn btn-secondary btn-xs" onclick="clearAllFilters()">🗑️ Xóa bộ lọc</button>
-							</div>
-						</div>
-					</div>
-
-
                     <!-- Bulk Actions Toolbar -->
                     <div class="bulk-actions-toolbar">
                         <div class="selection-controls">
@@ -321,7 +324,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3><i class="fas fa-envelope-open"></i> Chi tiết tin nhắn</h3>
-                <span class="close" onclick="closeModal()">&times;</span>
+                <span class="close" onclick="closeModal()">×</span>
             </div>
             <div class="modal-body">
                 <div class="message-detail-grid">
@@ -375,6 +378,9 @@
     <audio id="notificationSound" preload="auto">
         <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmUbBTiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmUbBTiR1/LMeSwF" type="audio/wav">
     </audio>
+    <footer class="footer-copyright">
+        © 2025. Bản quyền và phát triển thuộc về <a href="https://www.facebook.com/clonethinh/" target="_blank" rel="noopener noreferrer"><strong>Phạm Thịnh</strong></a>.
+    </footer>
 
     <!-- Link to external JavaScript file -->
     <script src="script.js"></script>
