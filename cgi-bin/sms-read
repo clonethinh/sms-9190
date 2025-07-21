@@ -85,4 +85,3 @@ for ID in $SMS_IDS; do
 done
 
 echo '] }'
-
