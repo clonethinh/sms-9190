@@ -16,6 +16,9 @@ if [ -z "$MODEM_ID" ]; then
     exit 1
 fi
 
+# --- LẤY STORAGE HIỆN TẠI (SM/ME) ---
+CURRENT_STORAGE=$(mmcli -m "$MODEM_ID" --command="AT+CPMS?" | grep -o '"[A-Z]*"' | head -n1 | tr '[:upper:]' '[:lower:]' | tr -d '"')
+
 # --- ĐỌC DANH SÁCH SMS ---
 SMS_IDS=$(mmcli -m "$MODEM_ID" --messaging-list-sms 2>/dev/null | grep -E "(received|sent)" | awk -F '/' '{print $NF}')
 
@@ -31,8 +34,7 @@ FIRST=1
 for ID in $SMS_IDS; do
     INFO=$(mmcli -s "$ID" 2>/dev/null)
     [ -z "$INFO" ] && continue
-    
-    # Clean text extraction - loại bỏ | và dấu -
+
     TEXT=$(echo "$INFO" | awk '
         /text:/ { 
             found=1; 
@@ -41,7 +43,7 @@ for ID in $SMS_IDS; do
             next 
         }
         found && /Properties/ { found=0 }
-        found && !/^[[:space:]]*-+[[:space:]]*$/ { 
+        found && !/^[[:space:]]*-+[[:space:]]*$/ {
             gsub(/^[[:space:]]*\|[[:space:]]*/, ""); 
             gsub(/^[[:space:]]*-+[[:space:]]*$/, "");
             if ($0 != "" && $0 !~ /^[[:space:]]*$/) {
@@ -49,26 +51,25 @@ for ID in $SMS_IDS; do
                 else result=$0;
             }
         }
-        END { 
+        END {
             gsub(/[[:space:]]+/, " ", result);
             gsub(/^[[:space:]]+|[[:space:]]+$/, "", result);
             gsub(/\\/, "\\\\", result);
             gsub(/"/, "\\\"", result);
-            print result 
+            print result
         }')
-        
-    NUMBER=$(echo "$INFO" | grep -m 1 "number:" | sed 's/.*number:[[:space:]]*//')
-    
-    DATE=$(echo "$INFO" | grep -m 1 "timestamp:" | sed 's/.*timestamp:[[:space:]]*//')
-    if [ -z "$DATE" ]; then
-        DATE=$(date -Iseconds)
-    fi
 
+    [ -z "$TEXT" ] && continue
+
+    NUMBER=$(echo "$INFO" | grep -m 1 "number:" | sed 's/.*number:[[:space:]]*//')
+    DATE=$(echo "$INFO" | grep -m 1 "timestamp:" | sed 's/.*timestamp:[[:space:]]*//')
     TYPE=$(echo "$INFO" | grep -m 1 "pdu type:" | sed 's/.*pdu type:[[:space:]]*//')
     STATE=$(echo "$INFO" | grep -m 1 "state:" | sed 's/.*state:[[:space:]]*//')
     STORAGE=$(echo "$INFO" | grep -m 1 "storage:" | sed 's/.*storage:[[:space:]]*//')
 
-    [ -z "$TEXT" ] && continue
+    # Gán storage nếu rỗng
+    [ -z "$STORAGE" ] && STORAGE="$CURRENT_STORAGE"
+    [ -z "$DATE" ] && DATE=$(date -Iseconds)
 
     [ "$FIRST" -eq 0 ] && echo ","
     FIRST=0
